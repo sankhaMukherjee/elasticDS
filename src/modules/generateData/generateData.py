@@ -19,12 +19,25 @@ def generateData(logger):
         The logger used for logging error information
     '''
 
+    print('Generating some data ...')
+
     N = 5000
     c = 5
 
     data = np.random.rand(N, c)
-    print(data.shape)
-    print(data[:10, :10])
+    columns = ['column_{:05d}'.format(i) for i in range(c)]
+    df = pd.DataFrame( data, columns=columns )
+    
+    df['result'] = np.random.rand() * 3
+
+    for i in range(c):
+        df['result'] += df['column_{:05d}'.format(i)] * np.random.rand() * 5
+
+    print('Data Generated ...')
+    print(df.head())
+
+    print('Saving data in data/raw_data')
+    df.to_csv('../data/raw_data/someData.csv', index=False)
 
 
     return

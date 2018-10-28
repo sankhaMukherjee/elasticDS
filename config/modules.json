@@ -8,13 +8,13 @@
     },{
         "moduleName" : "exampleElasticDS",
         "path"       : "modules/exampleElasticDS/exampleElasticDS.py",
-        "execute"    : false,
+        "execute"    : true,
         "description": "",
         "owner"      : ""
     },{
         "moduleName" : "generateData",
         "path"       : "modules/generateData/generateData.py",
-        "execute"    : true,
+        "execute"    : false,
         "description": "",
         "owner"      : ""
     }

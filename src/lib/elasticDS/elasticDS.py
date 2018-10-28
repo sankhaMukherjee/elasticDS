@@ -1,5 +1,6 @@
 from logs import logDecorator as lD
-import json
+import json, pprint
+from elasticsearch import Elasticsearch
 
 config = json.load(open('../config/config.json'))
 logBase = config['logging']['logBase'] + '.lib.elasticDS.elasticDS'
@@ -7,7 +8,7 @@ logBase = config['logging']['logBase'] + '.lib.elasticDS.elasticDS'
 class ElasticDS:
 
     @lD.log(logBase + '.ElasticDS')
-    def __init__(logger, self, indexName, hyperParams = None, headers = None, newIndex = True):
+    def __init__(logger, self, indexName, hyperParams = None, newIndex = True):
         '''Generates a new connection and index
         
         This class is used for generating a new class that will
@@ -32,12 +33,12 @@ class ElasticDS:
         
 
         self.eDSconfig = json.load(open('../config/elasticDS.json'))
-        self.es        = ElasticSearch(self.eDSconfig['server'])
+        # self.es        = Elasticsearch([self.eDSconfig['server'],])
+        self.es        = Elasticsearch()
         self.indexName = indexName
 
-        if newIndex == False:
+        if newIndex == True:
             assert hyperParams is not None, '`hyperParams` cannot be `None` for creating an index'
-            assert headers is not None, '`headers` cannot be `None` for creating an index'
             
         if newIndex:
             logger.info(f'Generating a new index: {indexName}')
@@ -45,39 +46,51 @@ class ElasticDS:
             # Generate the request body
             # --------------------------------------
             requestBody = {}
-            requestBody['settings'] = eDSconfig['index_settings']
+            requestBody['settings'] = self.eDSconfig['index_settings']
+            requestBody['mappings'] = {"example":{}}
             mapping = {}
-            for h, t in hyperparameters:
+            for h, t in hyperParams:
                 mapping[h] = {
-                    'index' : 'not_analyzed',
+                    #'index' : 'not_analyzed',
                     'type'  : t
                 }
             mapping['headers'] = {
-                'index' : 'not_analyzed',
-                'type'  : 'string'
+                # 'index' : 'not_analyzed',
+                'type'  : 'text'
             }
             mapping['accuracy_train'] = {
-                'index' : 'not_analyzed',
+                # 'index' : 'not_analyzed',
                 'type'  : 'double'
             }
             mapping['accuracy_test'] = {
-                'index' : 'not_analyzed',
+                # 'index' : 'not_analyzed',
                 'type'  : 'double'
             }
             mapping['accuracy_validation'] = {
-                'index' : 'not_analyzed',
+                # 'index' : 'not_analyzed',
                 'type'  : 'double'
             }
             mapping['train_size'] = {
-                'index' : 'not_analyzed',
+                # 'index' : 'not_analyzed',
                 'type'  : 'integer'
             }
 
-            requestBody['mappings']['example'] = mappings
+            requestBody['mappings']['example']['properties'] = mapping
+
+            pprint.pprint(requestBody)
 
             try:
                 self.es.indices.create( index=self.indexName, body=requestBody)
             except Exception as e:
                 logger.error('Unable to geenrate a new index: {}'.format(e))
+
+        return
+
+    def writeData(self, data):
+
+        self.es.index( 
+            index    = self.indexName,
+            doc_type = 'example',
+            body     = data )
 
         return
