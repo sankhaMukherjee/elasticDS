@@ -2,7 +2,19 @@
     {
         "moduleName" : "module1",
         "path"       : "modules/module1/module1.py",
-        "execute"    : true ,
+        "execute"    : false,
+        "description": "",
+        "owner"      : ""
+    },{
+        "moduleName" : "exampleElasticDS",
+        "path"       : "modules/exampleElasticDS/exampleElasticDS.py",
+        "execute"    : false,
+        "description": "",
+        "owner"      : ""
+    },{
+        "moduleName" : "generateData",
+        "path"       : "modules/generateData/generateData.py",
+        "execute"    : true,
         "description": "",
         "owner"      : ""
     }
